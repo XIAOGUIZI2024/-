@@ -17,7 +17,7 @@
 * jdk动态代理 ：基于接口来实现
 * CGLIB: 基于继承来实现
 #   
-https://cn.bing.com/web/xlsc.aspx?dl=1&f=8
+
 
 
 
