@@ -66,5 +66,9 @@ public class RpcApplication {
 RpcApplication.init();
 ```
 * 注册中心初始化
- 
+ ```java
+RegistryConfig registryConfig = rpcConfig.getRegistryConfig();  
+Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());  
+registry.init(registryConfig);
+ ```
 * 
