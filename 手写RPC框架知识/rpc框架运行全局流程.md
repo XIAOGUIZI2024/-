@@ -62,4 +62,4 @@ public class RpcApplication {
 ```
 # rpc框架初始化
 * 加载配置类
-* 
+* 注册中心初始化
