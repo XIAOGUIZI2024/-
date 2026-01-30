@@ -60,3 +60,6 @@ public class RpcApplication {
     }  
 }
 ```
+# rpc框架初始化
+* 加载配置类
+* 
