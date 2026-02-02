@@ -38,8 +38,14 @@ if (inheritThreadLocals && parent.inheritableThreadLocals != null)
         ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
 ```
 2. **唯一标识**：分配一个同步（sync）的唯一ID来标识子线程
-    
-3. **初始化完成**：此时线程对象已在堆内存中准备就绪，等待运行
+```java
+// Thread类中的ID生成
+private static long threadSeqNumber;
+private static synchronized long nextThreadID() {
+    return ++threadSeqNumber;  // 同步保证ID唯一性
+}
+```
+2. **初始化完成**：此时线程对象已在堆内存中准备就绪，等待运行
 
 
 ---
@@ -47,14 +53,38 @@ if (inheritThreadLocals && parent.inheritableThreadLocals != null)
 ### **二、线程启动（Thread.start）**
 
 1. **启动调用**：初始化完成后调用`start()`方法启动线程
-    
-2. **启动机制**：
+```java
+public synchronized void start() {
+    /**
+     * 线程状态检查：只能是NEW状态才能启动
+     * 0 = NEW（新建状态）
+     */
+    if (threadStatus != 0)
+        throw new IllegalThreadStateException();
+
+    // 将线程添加到线程组
+    group.add(this);
+
+    boolean started = false;
+    try {
+        // 调用native方法启动线程
+        start0();
+        started = true;
+    } finally {
+        // 启动失败处理
+        if (!started) {
+            group.threadStartFailed(this);
+        }
+    }
+}
+```
+1. **启动机制**：
     
     - 当前线程（父线程）**同步告知Java虚拟机**
         
     - 只要**线程规划器空闲**，应立即启动调用`start()`方法的线程
         
-3. **含义理解**：
+2. **含义理解**：
     
     - `start()`是向JVM发送启动请求
         
