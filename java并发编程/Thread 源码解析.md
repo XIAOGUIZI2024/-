@@ -83,8 +83,29 @@ public synchronized void start() {
     - 当前线程（父线程）**同步告知Java虚拟机**
         
     - 只要**线程规划器空闲**，应立即启动调用`start()`方法的线程
+```java
+// 这是JVM内部的C++实现，大致逻辑如下：
+JNIEXPORT void JNICALL
+Java_java_lang_Thread_start0(JNIEnv *env, jobject this_obj) {
+    // 1. 创建操作系统线程
+    pthread_t tid;
+    int ret = pthread_create(&tid, NULL, 
+        (void *(*)(void *))thread_entry, this_obj);
+    
+    if (ret == 0) {
+        // 2. 设置Java层的nativePeer字段
+        JNI_CallVoidMethod(env, this_obj, setNativePeerMethod, (jlong)tid);
         
-2. **含义理解**：
+        // 3. 设置线程状态为RUNNABLE
+        JNI_SetIntField(env, this_obj, threadStatusField, RUNNABLE_VALUE);
+    } else {
+        // 创建失败，抛出异常
+        throw_new(env, "java/lang/IllegalThreadStateException",
+                 "Failed to create native thread");
+    }
+}
+```
+1. **含义理解**：
     
     - `start()`是向JVM发送启动请求
         
