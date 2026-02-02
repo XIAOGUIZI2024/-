@@ -25,10 +25,21 @@ private void init(ThreadGroup g, Runnable target, String name,
     - 上下文类加载器（contextClassLoader）
         
     - 可继承的ThreadLocal变量
-        
-3. **唯一标识**：分配一个同步（sync）的唯一ID来标识子线程
+```java
+// 在init方法中继承parent的属性
+this.daemon = parent.isDaemon();      // 继承Daemon状态
+this.priority = parent.getPriority(); // 继承优先级
+this.contextClassLoader = parent.getContextClassLoader(); // 继承ClassLoader
+this.inheritedAccessControlContext = acc; // 继承访问控制上下文
+
+// 如果有可继承的ThreadLocal，也会从parent复制过来
+if (inheritThreadLocals && parent.inheritableThreadLocals != null)
+    this.inheritableThreadLocals =
+        ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+```
+2. **唯一标识**：分配一个同步（sync）的唯一ID来标识子线程
     
-4. **初始化完成**：此时线程对象已在堆内存中准备就绪，等待运行
+3. **初始化完成**：此时线程对象已在堆内存中准备就绪，等待运行
 
 
 ---
