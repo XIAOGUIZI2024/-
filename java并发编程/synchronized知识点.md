@@ -318,3 +318,9 @@ public class CommonMistakes {
         }
     }
 }
+```
+# synchronized 锁升级机制
+## 锁-MarkWord的结构图
+
+![](assets/synchronized知识点/file-20260203215655276.png)
+* 有两个注意的点 就是**偏向锁状态** 和 **无锁状态** 锁标志位是相同的，但是**无锁状态**这个偏向锁标志是0 而 **偏向锁状态** 这个偏向锁的标志是1
