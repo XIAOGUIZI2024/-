@@ -115,7 +115,7 @@ public class VisibilityExample {
         return count;  // 获取锁时从主内存读取最新值
     }
 }
-
+```
 **与volatile的区别**：
 
 |特性|synchronized|volatile|
@@ -125,12 +125,10 @@ public class VisibilityExample {
 |互斥访问|✅|❌|
 |性能开销|较高|较低|
 
-### 3. **原子性**
+### **原子性**
 
 **实现原理**：通过线程互斥确保代码块不可分割
-
-java
-
+```java
 public class AtomicityExample {
     private int balance = 100;
     
@@ -155,13 +153,11 @@ public class AtomicityExample {
         to.balance += amount;  // 两个操作作为一个原子单元
     }
 }
-
-### 4. **可重入性**
+```
+### **可重入性**
 
 **定义**：同一线程可以重复获取同一把锁
-
-java
-
+```java
 // ThreadReln.java 示例扩展
 public class ReentrantExample {
     public synchronized void method1() {
@@ -187,8 +183,9 @@ class ReentrantTest {
         t.start();
     }
 }
-
+```
 **可重入实现原理**：
+```
 
 java
 
