@@ -58,3 +58,277 @@ public class FineGrainedLock {
         }
     }
 }
+```
+# 四大核心特性
+
+### **有序性**
+
+**含义**：确保指令执行顺序的一致性，防止指令重排序
+
+**具体表现**：
+```java
+public class OrderExample {
+    private int x = 0;
+    private boolean flag = false;
+    
+    public synchronized void writer() {
+        x = 42;          // 1
+        flag = true;     // 2 - 在同步块内不会被重排序到1之前
+    }
+    
+    public synchronized void reader() {
+        if (flag) {
+            System.out.println(x);  // 总能读到42
+        }
+    }
+}
+```
+**四种互斥情况**：
+
+- **读读**：非互斥（无数据竞争）
+    
+- **读写**：互斥（防止读到中间状态）
+    
+- **写写**：互斥（防止数据覆盖）
+    
+- **写读**：互斥（保证读到最新值）
+    
+
+###  **可见性**
+
+**原理机制**：
+
+1. **获取锁时**：JMM（Java内存模型）会将工作内存中的共享变量失效，强制从主内存重新读取
+    
+2. **释放锁时**：JMM会将工作内存中的共享变量刷新到主内存
+```java
+public class VisibilityExample {
+    private int count = 0;  // 不使用volatile
+    
+    public synchronized void increment() {
+        count++;  // 1.从主内存读取最新值
+                  // 2.在工作内存中递增
+                  // 3.释放锁时刷新到主内存
+    }
+    
+    public synchronized int getCount() {
+        return count;  // 获取锁时从主内存读取最新值
+    }
+}
+
+**与volatile的区别**：
+
+|特性|synchronized|volatile|
+|---|---|---|
+|可见性保证|✅|✅|
+|原子性保证|✅（复合操作）|❌（仅单次读/写）|
+|互斥访问|✅|❌|
+|性能开销|较高|较低|
+
+### 3. **原子性**
+
+**实现原理**：通过线程互斥确保代码块不可分割
+
+java
+
+public class AtomicityExample {
+    private int balance = 100;
+    
+    // 非原子操作的问题
+    public void unsafeWithdraw(int amount) {
+        if (balance >= amount) {
+            // 这里可能被其他线程中断
+            balance -= amount;
+        }
+    }
+    
+    // synchronized保证原子性
+    public synchronized void safeWithdraw(int amount) {
+        if (balance >= amount) {
+            balance -= amount;  // 检查和扣款是一个原子操作
+        }
+    }
+    
+    // 复合操作的原子性
+    public synchronized void transfer(AtomicityExample to, int amount) {
+        this.balance -= amount;
+        to.balance += amount;  // 两个操作作为一个原子单元
+    }
+}
+
+### 4. **可重入性**
+
+**定义**：同一线程可以重复获取同一把锁
+
+java
+
+// ThreadReln.java 示例扩展
+public class ReentrantExample {
+    public synchronized void method1() {
+        System.out.println("进入method1");
+        method2();  // 可重入：当前线程已持有锁，可以再次进入同步方法
+        System.out.println("离开method1");
+    }
+    
+    public synchronized void method2() {
+        System.out.println("进入method2");
+        // 不需要重新获取锁
+    }
+}
+
+// 验证可重入性的测试
+class ReentrantTest {
+    public static void main(String[] args) {
+        ReentrantExample example = new ReentrantExample();
+        
+        Thread t = new Thread(() -> {
+            example.method1();  // 可以嵌套调用同步方法
+        });
+        t.start();
+    }
+}
+
+**可重入实现原理**：
+
+java
+
+// 伪代码展示锁的实现
+class Monitor {
+    int count = 0;      // 重入次数计数器
+    Thread owner = null;// 锁持有者
+    
+    void enter() {
+        Thread current = Thread.currentThread();
+        if (owner == current) {
+            count++;  // 重入：增加计数
+            return;
+        }
+        // 否则竞争锁...
+    }
+    
+    void exit() {
+        if (owner != Thread.currentThread()) {
+            throw new IllegalMonitorStateException();
+        }
+        count--;
+        if (count == 0) {
+            owner = null;  // 完全释放锁
+            // 唤醒等待线程
+        }
+    }
+}
+
+## 二、内存语义与实现原理
+
+### 1. **内存屏障（Memory Barrier）**
+
+synchronized通过插入内存屏障保证可见性和有序性：
+
+java
+
+public class MemoryBarrierExample {
+    // synchronized相当于以下屏障组合：
+    // 加锁时：LoadLoad + LoadStore 屏障
+    // 释放锁时：StoreStore + StoreLoad 屏障
+    
+    private int x, y;
+    private boolean ready;
+    
+    public void writer() {
+        x = 1;
+        y = 2;
+        synchronized(this) {
+            ready = true;  // StoreStore屏障：保证x=1,y=2先写入内存
+        }
+        // StoreLoad屏障：保证ready=true对所有线程可见
+    }
+    
+    public void reader() {
+        synchronized(this) {
+            if (ready) {  // LoadLoad屏障：保证从内存读取最新值
+                // LoadStore屏障：防止后续指令重排序
+                int r1 = x;
+                int r2 = y;
+            }
+        }
+    }
+}
+
+### 2. **锁升级过程**
+
+现代JVM的锁优化：
+
+text
+
+无锁 → 偏向锁 → 轻量级锁 → 重量级锁
+
+- **偏向锁**：单线程访问时的优化
+    
+- **轻量级锁**：多线程轻度竞争时的优化
+    
+- **重量级锁**：真正互斥，涉及操作系统互斥量
+    
+
+## 三、实际应用要点
+
+### 1. **正确使用模式**
+
+java
+
+// 模式1：保护共享变量
+public class SharedResource {
+    private final Object lock = new Object();
+    private int sharedData;
+    
+    public void updateData(int newValue) {
+        synchronized(lock) {
+            sharedData = newValue;
+            // 其他相关操作...
+        }
+    }
+}
+
+// 模式2：保护复合操作
+public class Account {
+    private double balance;
+    
+    // 保证检查和更新的原子性
+    public boolean withdraw(double amount) {
+        synchronized(this) {
+            if (balance >= amount) {
+                balance -= amount;
+                return true;
+            }
+            return false;
+        }
+    }
+}
+
+### 2. **注意事项**
+
+java
+
+public class CommonMistakes {
+    // 错误1：锁对象被改变
+    private Object lock = new Object();
+    public void mistake1() {
+        synchronized(lock) {
+            lock = new Object();  // 错误！锁对象被改变
+        }
+    }
+    
+    // 错误2：字符串字面量作为锁（危险）
+    public void mistake2() {
+        synchronized("LOCK") {  // 字符串字面量全局共享！
+            // 可能与其他代码意外互斥
+        }
+    }
+    
+    // 正确做法：使用private final对象
+    private final Object safeLock = new Object();
+    public void correctMethod() {
+        synchronized(safeLock) {
+            // 安全操作
+        }
+    }
+}
