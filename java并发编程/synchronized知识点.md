@@ -185,10 +185,7 @@ class ReentrantTest {
 }
 ```
 **可重入实现原理**：
-```
-
-java
-
+```java
 // 伪代码展示锁的实现
 class Monitor {
     int count = 0;      // 重入次数计数器
@@ -214,15 +211,13 @@ class Monitor {
         }
     }
 }
-
+```
 ## 二、内存语义与实现原理
 
-### 1. **内存屏障（Memory Barrier）**
+## **内存屏障（Memory Barrier）**
 
 synchronized通过插入内存屏障保证可见性和有序性：
-
-java
-
+```java
 public class MemoryBarrierExample {
     // synchronized相当于以下屏障组合：
     // 加锁时：LoadLoad + LoadStore 屏障
@@ -250,12 +245,10 @@ public class MemoryBarrierExample {
         }
     }
 }
-
-### 2. **锁升级过程**
+```
+### **锁升级过程**
 
 现代JVM的锁优化：
-
-text
 
 无锁 → 偏向锁 → 轻量级锁 → 重量级锁
 
