@@ -259,12 +259,10 @@ public class MemoryBarrierExample {
 - **重量级锁**：真正互斥，涉及操作系统互斥量
     
 
-## 三、实际应用要点
+## 实际应用要点
 
-### 1. **正确使用模式**
-
-java
-
+### **正确使用模式**
+```java
 // 模式1：保护共享变量
 public class SharedResource {
     private final Object lock = new Object();
@@ -293,11 +291,9 @@ public class Account {
         }
     }
 }
-
-### 2. **注意事项**
-
-java
-
+```
+### **注意事项**
+```java
 public class CommonMistakes {
     // 错误1：锁对象被改变
     private Object lock = new Object();
