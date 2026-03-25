@@ -150,4 +150,20 @@
 具体的实现思路
 接收到前端传来的数据，先进行验证参数，，参数没有问题就借助hutool工具类进行调用远程得到第三方的接口
 接口的请求格式为：
-Unirest.setTimeouts(0, 0); HttpResponse<String> response = Unirest.post("https://openapi.shanjian.tv/v1/voice/train") .header("Authorization", "Bearer {{appKey}}") .header("Content-Type", "application/json") .body("{\n \"audioUrl\": \"https://fragrant-makeover.info/reproduce.mp3\",\n \"model\": \"v2\",\n \"language\": \"zh-CN\",\n \"demoText\": \"你好，我是你的专属AI克隆声音\",\n \"callbackUrl\": \"https://blind-adviser.com/hook\"\n}") .asString();
+|参数名称|类型|是否必需|说明|示例值|
+|---|---|---|---|---|
+|Authorization|string|是|接口鉴权，注意 Bearer 与密钥之间有一空格|`Bearer {{appKey}}`|
+|Content-Type|string|是|数据传输格式|`application/json`|
+
+### [](https://open.bigmodel.cn/trialcenter/modeltrial/text#2-%E8%AF%B7%E6%B1%82%E4%BD%93)2. 请求体
+
+参数格式为 `application/json`，具体字段如下：
+
+| 参数名称        | 类型     | 是否必需 | 说明                                                  |
+| ----------- | ------ | ---- | --------------------------------------------------- |
+| audioUrl    | string | 是    | 复刻音频的URL地址                                          |
+| model       | string | 是    | 声音复刻模型，枚举值：`v1`, `v2`, `v3`, `s1`, `s3`             |
+| language    | string | 是    | 复刻音频语种                                              |
+| demoText    | string | 否    | 试听音频文案，需与语种对应；默认值：`你好，我是你的AI专属克隆声音，希望未来的日子一起好好相处哦。` |
+| callbackUrl | string | 否    | 结果回调地址                                              |
+-- **主要**这个密钥 **key** 是：
