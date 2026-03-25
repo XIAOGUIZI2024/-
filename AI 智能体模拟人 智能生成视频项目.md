@@ -150,3 +150,4 @@
 具体的实现思路
 接收到前端传来的数据，先进行验证参数，，参数没有问题就借助hutool工具类进行调用远程得到第三方的接口
 接口的请求格式为：
+Unirest.setTimeouts(0, 0); HttpResponse<String> response = Unirest.post("https://openapi.shanjian.tv/v1/voice/train") .header("Authorization", "Bearer {{appKey}}") .header("Content-Type", "application/json") .body("{\n \"audioUrl\": \"https://fragrant-makeover.info/reproduce.mp3\",\n \"model\": \"v2\",\n \"language\": \"zh-CN\",\n \"demoText\": \"你好，我是你的专属AI克隆声音\",\n \"callbackUrl\": \"https://blind-adviser.com/hook\"\n}") .asString();
