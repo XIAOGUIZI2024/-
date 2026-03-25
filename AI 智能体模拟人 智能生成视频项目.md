@@ -148,14 +148,15 @@
 * post 请求
 * api地址 ：自己定义
 具体的实现思路
-接收到前端传来的数据，先进行验证参数，，参数没有问题就借助hutool工具类进行调用远程得到第三方的接口
+接收到前端传来的数据，先进行验证参数，，参数没有问题就借助hutool工具类进行调用远程得到第三方的接口,zuihao
 接口的请求格式为：
-|参数名称|类型|是否必需|说明|示例值|
-|---|---|---|---|---|
-|Authorization|string|是|接口鉴权，注意 Bearer 与密钥之间有一空格|`Bearer {{appKey}}`|
-|Content-Type|string|是|数据传输格式|`application/json`|
 
-### [](https://open.bigmodel.cn/trialcenter/modeltrial/text#2-%E8%AF%B7%E6%B1%82%E4%BD%93)2. 请求体
+| 参数名称          | 类型     | 是否必需 | 说明                       | 示例值                 |
+| ------------- | ------ | ---- | ------------------------ | ------------------- |
+| Authorization | string | 是    | 接口鉴权，注意 Bearer 与密钥之间有一空格 | `Bearer {{appKey}}` |
+| Content-Type  | string | 是    | 数据传输格式                   | `application/json`  |
+
+###  请求体
 
 参数格式为 `application/json`，具体字段如下：
 
@@ -166,4 +167,13 @@
 | language    | string | 是    | 复刻音频语种                                              |
 | demoText    | string | 否    | 试听音频文案，需与语种对应；默认值：`你好，我是你的AI专属克隆声音，希望未来的日子一起好好相处哦。` |
 | callbackUrl | string | 否    | 结果回调地址                                              |
+### 响应体
+
+|参数名称|类型|是否必需|描述|
+|---|---|---|---|
+|**code**|string|是|表示本次请求的状态，值=`Succeed`时表示成功，其他均为失败，失败时错误码参照错误码表|
+|**data**|object|是|返回数据对象|
+|∟ **taskId**|string|是|任务ID|
+|∟ **message**|string|是|错误描述信息，当 `code` 不等于 `Succeed` 时返回|
+|∟ **requestId**|string|是|本次请求唯一ID，若接口响应异常请提供该ID给到技术侧排查|
 -- **主要**这个密钥 **key** 是：czjnhwjgakulegztaspdrnkk
