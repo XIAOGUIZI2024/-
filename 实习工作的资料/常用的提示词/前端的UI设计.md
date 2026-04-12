@@ -166,9 +166,7 @@
 
 ## 提供的资源
 
-@需求分析文档
-@方案设计文档
-@UI原型图
+@D:\project-work\gzgoodidea-video-generater\docs\页面样式的修改\AttractVideoCreate文件分析报告.md -- 这个是AttractVideoCreate文件的详细报告
 
 ## 需要完成的任务
 
